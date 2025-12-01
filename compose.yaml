@@ -1,0 +1,53 @@
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: budget_app 
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d example_app_development"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # web:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   environment:
+  #     RAILS_ENV: development
+  #     RACK_ENV: development
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: postgres
+  #     POSTGRES_DB: example_app_development
+  #     POSTGRES_HOST: db
+  #     POSTGRES_PORT: 5432
+  #     RAILS_LOG_TO_STDOUT: "true"
+  #     RAILS_SERVE_STATIC_FILES: "false"
+  #     CLERK_SECRET_KEY: ${CLERK_SECRET_KEY}
+  #     CLERK_SIGN_IN_URL: "https://driving-starfish-28.accounts.dev/sign-in"
+  #   volumes:
+  #     # - .:/rails
+  #     # - bundle-cache:/usr/local/bundle
+  #     - node-modules:/rails/node_modules
+  #     - tmp-data:/rails/tmp
+  #     - log-data:/rails/log
+  #   ports:
+  #     - "3000:3000"
+  #   command: bin/rails server -b 0.0.0.0 -p 3000
+  #   restart: unless-stopped
+
+volumes:
+  db-data:
+  bundle-cache:
+  node-modules:
+  tmp-data:
+  log-data:
