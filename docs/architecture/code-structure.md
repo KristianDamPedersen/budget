@@ -21,6 +21,7 @@ The goal is to keep boundaries explicit while staying fully idiomatic in Ruby an
 
 ## 2. Folder Structure
 All domain logic lives under app/domains. Each module is isolated.
+```
 app/
   domains/
     users/
@@ -72,10 +73,8 @@ config/
   routes.rb
 
 db/
-  users_migrate/
-  events_migrate/
-  analytics_migrate/
   migrate/
+```
 
 ## 3. Dependency Rules
 ### Allowed
@@ -101,16 +100,20 @@ Rule of thumb
 * Free to change as long as consumers in that module are updated
 
 Example:
+```ruby
 module Users
   module Events
     class UserRegistered < RailsEventStore::Event
     end
   end
 end
+```
+
 ### 4.2 Integration Events (external)
 * Namespaced under Integration::Events::<Module>
 * Consumed by other modules
 * More stable structure
+```ruby
 module Integration
   module Events
     module Users
@@ -119,8 +122,12 @@ module Integration
     end
   end
 end
+```
+
+
 ### 4.3 Mapping Domain → Integration
 Handled by mapping handlers inside the module:
+```ruby
 module Users
   module Handlers
     class PublishUserRegisteredIntegrationEvent
@@ -137,6 +144,7 @@ module Users
     end
   end
 end
+```
 
 ## 5. Persistence Layer
 ### 5.1 ActiveRecord (skinny AR)
@@ -265,7 +273,7 @@ Rails.configuration.event_store.subscribe(
 
 ## 10. Game Plan: Adding a New Entity
 Example: add Users::Profile.
-1. Create migration under db/users_migrate
+1. Create migration
 2. Create AR model app/domains/users/domain/profile.rb
 3. Add use cases if needed
 4. Add handlers/events if needed
