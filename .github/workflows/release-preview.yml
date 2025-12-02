@@ -1,0 +1,130 @@
+name: Release Preview
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  release-preview:
+    name: Semantic Release (dry run)
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write      # needed so semantic-release can check push perms
+      pull-requests: write # needed to post the comment
+
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}   # actual feature/PR branch
+          fetch-depth: 0                # semantic-release needs full history & tags
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          elif [ -f yarn.lock ]; then
+            yarn install --frozen-lockfile
+          else
+            npm install
+          fi
+
+      - name: Semantic Release (dry run)
+        id: semrel
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Running semantic-release preview on branch: $GITHUB_HEAD_REF"
+
+          # Use git-based branch detection and run in dry-run mode
+          OUTPUT=$(unset GITHUB_ACTIONS && npx semantic-release --no-ci --dry-run --branches "$GITHUB_HEAD_REF" || true)
+
+          echo "$OUTPUT"
+
+          # Expose full output for later steps (PR comment)
+          echo 'full_output<<EOF' >> $GITHUB_OUTPUT
+          printf '%s\n' "$OUTPUT" >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
+
+          # ---- extract next version ----
+          # Look for the line containing "next release version is" (case-insensitive),
+          # then grab the semver from that line.
+          VERSION=$(printf '%s\n' "$OUTPUT" \
+            | grep -i 'next release version is' \
+            | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' \
+            | tail -n1)
+
+          if [ -z "$VERSION" ]; then
+            VERSION="(no release will be published)"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+          # ---- extract changelog-style release notes ----
+          # semantic-release prints something like:
+          #   Release note for version 1.0.0:
+          #   # 1.0.0 (2025-12-02)
+          #   ...
+          # We grab from the markdown heading "# x.y.z" to the end.
+          NOTES=$(printf '%s\n' "$OUTPUT" \
+            | awk '/^# [0-9]+\.[0-9]+\.[0-9]+/ {flag=1} flag')
+
+          if [ -z "$NOTES" ]; then
+            NOTES="(no release notes generated)"
+          fi
+
+          echo 'notes<<EOF' >> $GITHUB_OUTPUT
+          printf '%s\n' "$NOTES" >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
+
+      - name: Comment on PR with release preview
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        uses: actions/github-script@v7
+        env:
+          SEMREL_VERSION: ${{ steps.semrel.outputs.version }}
+          SEMREL_NOTES: ${{ steps.semrel.outputs.notes }}
+          SEMREL_OUTPUT: ${{ steps.semrel.outputs.full_output }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const version = process.env.SEMREL_VERSION;
+            const notes = process.env.SEMREL_NOTES;
+            const output = process.env.SEMREL_OUTPUT;
+
+            const body = `
+            🤖 **Semantic Release Preview**
+
+            **Next version:** \`${version}\`
+
+            <details>
+            <summary>Changelog preview</summary>
+
+            \`\`\`markdown
+            ${notes}
+            \`\`\`
+
+            </details>
+
+            <details>
+            <summary>Raw semantic-release log</summary>
+
+            \`\`\`
+            ${output}
+            \`\`\`
+
+            </details>
+            `;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body
+            });
+
