@@ -23,11 +23,10 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
 
-    /* Aliases */
+    /* ShadcnUI */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["app/frontend/*"],
-      "~/*": ["app/frontend/*"]
+      "@/*": ["./app/frontend/*"]
     }
   },
   "include": ["app/frontend"]
