@@ -30,6 +30,8 @@ module Authentication
         # Minimal normalization
         email = request.email.to_s.strip.downcase
         raise ArgumentError, "email required" if email.empty?
+        raise ArgumentError, "provider required" if request.provider.to_s.strip.empty?
+        raise ArgumentError, "provider_uid required" if request.provider_uid.to_s.strip.empty?
 
         user = Authentication::Domain::User.find_or_initialize_by(
           provider: request.provider,
