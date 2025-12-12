@@ -64,12 +64,14 @@ class Auth::SessionsController < ApplicationController
       )
 
     )
+
     Rails.logger.info("WorkOS callback: created/upserted user_id=#{user_response.user_id}")
 
     signed_in_user = Authentication::UseCases::FetchUser.new.call(
       Authentication::UseCases::FetchUser::Request.new(user_id: user_response.user_id)
     )
 
+    # Sign in the app user
     sign_in(signed_in_user)
     Rails.logger.info("WorkOS callback: signed in session user_id=#{session[:user_id]}")
 

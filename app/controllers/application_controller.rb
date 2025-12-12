@@ -40,6 +40,9 @@ class ApplicationController < ActionController::Base
   # FIX: DOCS before flight
   # FIX: TESTS before flight
   def sign_in(user)
+    preserved_workos_sid = session[:workos_session_id]
+    reset_session
+    session[:workos_session_id] = preserved_workos_sid if preserved_workos_sid.present?
     session[:user_id] = user.id
   end
 
