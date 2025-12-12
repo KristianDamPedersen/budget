@@ -111,14 +111,48 @@ class Auth::SessionsController < ApplicationController
 
   private
 
+  WORKOS_JWKS_URI = URI("https://api.workos.com/user_management/jwks")
+  WORKOS_ISS = "https://api.workos.com/user_management/#{ENV.fetch("WORKOS_CLIENT_ID")}"
+  WORKOS_AUD = ENV.fetch("WORKOS_CLIENT_ID")
+
+  # FIX: DOCS before flight
+  # FIX: TESTS before flight
+  def workos_jwks
+    # fetch the jwks url
+    jwks_url = WorkOS::UserManagement.get_jwks_url(ENV["WORKOS_CLIENT_ID"])
+    Rails.logger.info("JWKS URL: #{jwks_url}")
+
+    @workos_jwks ||= begin
+      uri = URI(jwks_url)
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+      if ENV["WORKOS_SSL_NO_VERIFY"] == "1"
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      else
+        http.cert_store = OpenSSL::X509::Store.new.tap { |s| s.set_default_paths }
+      end
+      response = http.get(uri.request_uri)
+      JWT::JWK::Set.new(JSON.parse(response.body))
+    end
+  end
+
   # FIX: DOCS before flight
   # FIX: TESTS before flight
   def store_workos_session_id(access_token)
     return if access_token.blank?
 
-    decoded = JWT.decode(access_token, nil, false).first
-    session_id = decoded["sid"]
+    decoded, = JWT.decode(
+      access_token,
+      nil,
+      true, # enable verification
+      algorithms: [ "RS256" ],
+      jwks: workos_jwks,
+      iss: WORKOS_ISS,
+      verify_iss: true,
+      verify_aud: false
+    )
 
+    session_id = decoded["sid"]
     if session_id.present?
       Rails.logger.info("WorkOS callback: storing session_id=#{session_id}")
       session[:workos_session_id] = session_id
@@ -126,7 +160,7 @@ class Auth::SessionsController < ApplicationController
       Rails.logger.warn("WorkOS callback: access token missing sid claim")
     end
   rescue JWT::DecodeError => e
-    Rails.logger.warn("WorkOS callback: failed to decode access token for logout sid: #{e.message}")
+    Rails.logger.warn("WorkOS callback: failed to verify access token for logout sid: #{e.message}")
   end
 
   # FIX: DOCS before flight
