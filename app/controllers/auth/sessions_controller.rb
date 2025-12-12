@@ -46,7 +46,7 @@ class Auth::SessionsController < ApplicationController
       "wos_session",
       value: auth_response.sealed_session,
       httponly: true,
-      secure: request.ssl?,
+      secure: workos_cookie_secure?,
       samesite: "lax"
     )
 
@@ -171,5 +171,11 @@ class Auth::SessionsController < ApplicationController
   # FIX: DOCS before flight
   def inertia_request?
     request.headers["X-Inertia"].present?
+  end
+
+  # FIX: DOCS before flight
+  def workos_cookie_secure?
+    return false if ENV["WORKOS_SSL_NO_VERIFY"] == "1"
+    true
   end
 end
