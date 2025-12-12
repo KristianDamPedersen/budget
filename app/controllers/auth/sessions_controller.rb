@@ -53,7 +53,15 @@ class Auth::SessionsController < ApplicationController
     # store_workos_session_id(auth_response.access_token)
 
     workos_user = auth_response.user
+
+    # Check for email verifiaction before we create the user in the database
+    unless workos_user.respon_to?(:email_verified) && workos_user.email_verified
+      return redirect_to root_path, alert: "Email is not verified"
+    end
+
     Rails.logger.info("WorkOS callback: authenticated WorkOS user")
+
+    # Post authentication we fetch or initialize the user in the app database.
     user_response = Authentication::UseCases::CreateUser.new.call(
       Authentication::UseCases::CreateUser::Request.new(
         first_name: workos_user.first_name || workos_user.given_name || "",
@@ -62,7 +70,6 @@ class Auth::SessionsController < ApplicationController
         provider: :workos,
         provider_uid: workos_user.id
       )
-
     )
 
     Rails.logger.info("WorkOS callback: user record persisted")
