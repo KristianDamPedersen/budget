@@ -53,7 +53,7 @@ class Auth::SessionsController < ApplicationController
     # store_workos_session_id(auth_response.access_token)
 
     workos_user = auth_response.user
-    Rails.logger.info("WorkOS callback: authenticated workos_user id=#{workos_user.id} email=#{workos_user.email}")
+    Rails.logger.info("WorkOS callback: authenticated WorkOS user")
     user_response = Authentication::UseCases::CreateUser.new.call(
       Authentication::UseCases::CreateUser::Request.new(
         first_name: workos_user.first_name || workos_user.given_name || "",
@@ -65,7 +65,7 @@ class Auth::SessionsController < ApplicationController
 
     )
 
-    Rails.logger.info("WorkOS callback: created/upserted user_id=#{user_response.user_id}")
+    Rails.logger.info("WorkOS callback: user record persisted")
 
     signed_in_user = Authentication::UseCases::FetchUser.new.call(
       Authentication::UseCases::FetchUser::Request.new(user_id: user_response.user_id)
@@ -73,7 +73,7 @@ class Auth::SessionsController < ApplicationController
 
     # Sign in the app user
     sign_in(signed_in_user)
-    Rails.logger.info("WorkOS callback: signed in session user_id=#{session[:user_id]}")
+    Rails.logger.info("WorkOS callback: user signed in")
 
     redirect_to root_path, notice: "Signed in"
 
