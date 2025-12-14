@@ -15,7 +15,7 @@
 #     I18n.locale = :es
 #
 # This would use the information in config/locales/es.yml.
-#
+
 # To learn more about the API, please read the Rails Internationalization guide
 # at https://guides.rubyonrails.org/i18n.html.
 #
@@ -29,3 +29,7 @@
 
 en:
   hello: "Hello world"
+
+  pages:
+    inertia_example:
+      green_text: "english text"
