@@ -1,0 +1,9 @@
+da:
+  common:
+    save: "gem"
+    close: "luk"
+    back: "tilbage"
+
+  pages:
+    inertia_example:
+      green_text: "dansk tekst"
