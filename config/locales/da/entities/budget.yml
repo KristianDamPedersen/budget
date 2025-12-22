@@ -1,0 +1,13 @@
+da:
+  entities:
+    budget:
+      default_categories:
+        food:
+          name: "Mad"
+          id: 0
+        housing:
+          name: "Bolig"
+          id: 1
+        insurance:
+          name: "Forsikringer"
+          id: 2

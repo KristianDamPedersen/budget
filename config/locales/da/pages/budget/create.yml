@@ -1,0 +1,11 @@
+da:
+  pages:
+    budget:
+      create:
+        title: "Start et nyt budget"
+        name_field_legend: "Navnet på dit budget"
+        name_field_description: "Navnet der bruges til at finde budgettet igen."
+        name_field_placeholder: "Mit første budget"
+        category_field_legend: "Kategorier"
+        category_field_description: "Fjern eller tilføj flere kategorier"
+        category_field_placeholder: "Realkreditlån"

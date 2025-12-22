@@ -1,0 +1,10 @@
+da:
+  common:
+    continue: "fortsæt"
+    cancel: "annuller"
+    create: "opret"
+    add: "tilføj"
+    delete: "slet"
+    name: "navn"
+    currency: "valuta"
+    value: "Værdi"

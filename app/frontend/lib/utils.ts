@@ -7,7 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 export type I18nNode = {
   [key: string]: I18nNode | string
 }
-export function i18n_t(i18n: I18nNode, path: string, fallback: string = path) {
+export function i18n_t(i18n: I18nNode, path: string, fallback: string = path): string {
   const keys = path.split(".")
   let current: I18nNode | string = i18n
   for (const key of keys) {
@@ -16,6 +16,8 @@ export function i18n_t(i18n: I18nNode, path: string, fallback: string = path) {
     }
     current = current[key]
   }
-
-  return current ?? fallback
+  if (typeof current == "string") {
+    return current ?? fallback
+  }
+  return "translation missing for: " + path
 }

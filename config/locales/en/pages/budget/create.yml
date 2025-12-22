@@ -1,0 +1,8 @@
+en:
+  pages:
+    budget:
+      create:
+        title: "Create a new budget"
+        name_field_legend: "Name"
+        name_field_description: "The name is used to identify the budget."
+        name_field_placeholder: "My first budget"
