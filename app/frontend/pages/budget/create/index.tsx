@@ -11,50 +11,9 @@ import { Separator } from '@radix-ui/react-separator'
 import { DraggableTree, DraggableTreeItem, DraggableTreeProps } from '@/components/Draggable-tree'
 import { Circle } from 'lucide-react'
 import { BudgetItemTable, BudgetItemTableProps } from '@/components/budget/BudgetItemTable'
-import { BudgetItem } from '@/types/budget/BudgetItem'
-import { CreateBudgetItemPopUp } from '@/components/budget/CreateBudgetItemPopUp'
+import { BudgetItem, BudgetItemRequest } from '@/types/budget/BudgetItem'
+import { CreateBudgetItemPopUp, CreateBudgetItemPopUpProps } from '@/components/budget/CreateBudgetItemPopUp'
 
-const budgetItems: BudgetItem[] = [
-  {
-    budget_id: "0",
-    name: "Office Software Subscriptions",
-    created_by: "user_123",
-    category_id: 10,
-    item_type: "expense",
-    cadence: "monthly",
-    first_occurence: new Date("2025-01-01"),
-    currency: "USD",
-    value: 89.99,
-    created_at: new Date("2025-01-01T09:15:00Z"),
-    updated_at: new Date("2025-01-01T09:15:00Z"),
-  },
-  {
-    budget_id: "1",
-    name: "Cloud Hosting Costs",
-    created_by: "user_456",
-    category_id: 20,
-    item_type: "expense",
-    cadence: "monthly",
-    first_occurence: new Date("2025-02-01"),
-    currency: "USD",
-    value: 320.5,
-    created_at: new Date("2025-02-01T10:30:00Z"),
-    updated_at: new Date("2025-02-10T14:45:00Z"),
-  },
-  {
-    budget_id: "2",
-    name: "Consulting Income",
-    created_by: "user_789",
-    category_id: "income",
-    item_type: "income",
-    cadence: "quarterly",
-    first_occurence: new Date("2025-01-15"),
-    currency: "EUR",
-    value: 4500,
-    created_at: new Date("2025-01-15T08:00:00Z"),
-    updated_at: new Date("2025-03-01T12:20:00Z"),
-  },
-]
 export type BudgetCategory = {
   name: string
   parent_id: string | null
@@ -74,7 +33,12 @@ type CreateBudgetProps = {
   default_categories: Record<string, BudgetCategory>
 }
 
+type CreateBudgetFormDataType = {
+  name: string,
+  items: BudgetItemRequest[],
+  categories: BudgetCategory[]
 
+}
 export default function CreateBudget() {
   const { name_field_legend,
     name_field_description,
@@ -91,9 +55,11 @@ export default function CreateBudget() {
   const [categoryTree, setCategoryTree] = useState<TreeDataItem[]>([])
   const [flattenedCategoryTree, setFlattenedCategoryTree] = useState<BudgetCategory[]>([])
   const [pendingCategoryName, SetPendingCategoryName] = useState<string>("")
-  const form = useForm({
+
+  const form = useForm<CreateBudgetFormDataType>({
     name: '',
-    categories: default_categories
+    categories: [],
+    items: []
   })
 
   function AddItem(item: BudgetItem) {
@@ -125,6 +91,20 @@ export default function CreateBudget() {
   }
   function onSubmit(e: React.FormEvent) {
     e.preventDefault()
+    console.log(flattenedCategoryTree)
+    form.transform((data) => ({
+      ...data,
+      items: items.map(x => ({
+        name: x.name,
+        category_id: x.category_id,
+        item_type: x.item_type,
+        cadence: x.cadence,
+        first_occurence: x.first_occurence,
+        currency: x.currency,
+        value: x.value
+      })),
+      categories: flattenedCategoryTree
+    }))
     form.post('/budget/create', {
       preserveScroll: true,
     })
@@ -188,7 +168,7 @@ export default function CreateBudget() {
                 <CreateBudgetItemPopUp
                   i18n={i18n}
                   onSubmit={AddItem}
-                  cadenceTypes={["daglig", "ugentlig", "månedlig", "kvartalvis", "halvårlig", "årlig", "engangs"]}
+                  cadenceTypes={["daglig", "ugentlig", "månedlig", "kvartalvis", "halvårlig", "årlig"]}
                   categories={flattenedCategoryTree}
                   itemTypes={["Fast udgift", "forbrugs mål"]} />
                 <BudgetItemTable

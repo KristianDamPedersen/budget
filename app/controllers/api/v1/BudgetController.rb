@@ -24,24 +24,26 @@ class Api::V1::BudgetController < InertiaController
     req = Budget::UseCases::CreateBudget::Request.new(
       name: budget_params[:name],
       owned_by:  "6658b89c-74aa-444c-95c9-acae486df11c",
-      categories: budget_params[:categories].to_h,
+      categories: budget_params[:categories],
+      items: budget_params[:items]
     )
 
    Budget::UseCases::CreateBudget.new.call(req)
-
-
-    # choose where to go next:
   rescue ActiveRecord::RecordInvalid => e
-    # Inertia-friendly: send validation errors back
+    Rails.logger.error("RecordInvalid: #{e.record.class} #{e.record.errors.full_messages.join(", ")}")
+
     redirect_back(
       fallback_location: "/budget/create",
       inertia: { errors: e.record.errors.to_hash(true) }
     )
   end
-
   private
 
   def budget_params
-  params.require(:budget).permit(:name, categories: {})
+   params.require(:budget).permit(
+    :name,
+    categories: [ :id, :name, :parent_id ],
+    items: [ :budget_id, :name, :category_id, :item_type, :cadence, :value, :currency, :first_occurence ]
+  )
   end
 end
