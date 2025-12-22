@@ -1,5 +1,5 @@
 import React from "react"
-import { TreeDataItem, TreeView } from "./tree-view"
+import { TreeDataItem, TreeRenderItemParams, TreeView } from "./tree-view"
 import { Button } from "./ui/button"
 import { i18n_t, I18nNode } from "@/lib/utils"
 
@@ -8,17 +8,11 @@ export interface DraggableTreeItem {
   id: string
 }
 
-export interface DraggableTreeHandle {
-  addRoot: (name: string, id?: string) => void
-  addChild: (parentId: string, name: string, id?: string) => void
-  remove: (id: string) => void
-  getTree: () => TreeDataItem[]
-}
 
 export interface DraggableTreeProps {
-  data: DraggableTreeItem[]
-  i18n: I18nNode,
-  onTreeChange?: (tree: TreeDataItem[]) => void
+  data: TreeDataItem[]
+  setData: (data: TreeDataItem[]) => void
+  localisedDeleteText: string
 }
 
 function cloneTree(items: TreeDataItem[]): TreeDataItem[] {
@@ -72,106 +66,50 @@ function addChild(tree: TreeDataItem[], parentId: string, child: TreeDataItem): 
   return next
 }
 
-function addRoot(tree: TreeDataItem[], item: TreeDataItem): TreeDataItem[] {
-  return [...cloneTree(tree), item]
-}
 
+export function DraggableTree(Props: DraggableTreeProps) {
+  const { localisedDeleteText: localised_delete, data, setData } = Props
+  return (
+    <TreeView
+      data={data}
+      onDocumentDrag={(source, target) => {
+        if (!target.id) return
+        const next = cloneTree(data)
+        const removed = removeNodeAndCollect(next, source.id)
+        if (!removed) return next
+        const tgt = findNode(next, target.id)
+        if (!tgt) return next
+        if (tgt.children != null) {
+          tgt.children = tgt.children.concat(removed)
+        } else {
+          tgt.children = removed
+        }
+        tgt.droppable = true
+        tgt.draggable = true
+        setData(next)
+      }
+      }
+      renderItem={(renderParams: TreeRenderItemParams) => (
 
-const DraggableTree = React.forwardRef<DraggableTreeHandle, DraggableTreeProps>(
-  ({ data, onTreeChange, i18n }, ref) => {
-    const [tree, setTree] = React.useState<TreeDataItem[]>([])
-    const withActions = (items: TreeDataItem[]): TreeDataItem[] =>
-      items.map((item) => ({
-        ...item,
-        actions: (
+        <div className="flex items-center justify-between gap-2 w-full">
+          <span className="truncate">{renderParams.item.name}</span>
           <Button
+            variant="destructive"
+            size="sm"
             onClick={(e) => {
-              e.stopPropagation()
               e.preventDefault()
-
-              setTree((prev) => {
-                const next = cloneTree(prev)
-                removeNodeAndCollect(next, item.id)
-                return next
-              })
+              e.stopPropagation() // don't toggle/expand/select on delete
+              var next = cloneTree(data)
+              removeNodeAndCollect(next, renderParams.item.id)
+              setData(next)
             }}
           >
-            {i18n_t(i18n, "common.delete")}
+            {localised_delete}
           </Button>
-        ),
-        children: item.children ? withActions(item.children) : undefined,
-      }))
-    React.useEffect(() => {
-      setTree(
-        data.map((d) => ({
-          id: d.id,
-          name: d.name,
-          draggable: true,
-          droppable: true,
-        }))
+        </div>
       )
-    }, [data])
-
-    // keep parent informed if you want
-    React.useEffect(() => {
-      onTreeChange?.(tree)
-    }, [tree, onTreeChange])
-
-    React.useImperativeHandle(
-      ref,
-      () => ({
-        addRoot: (name, id) => {
-          const newId = id ?? crypto.randomUUID()
-          setTree((prev) =>
-            addRoot(prev, { id: newId, name, draggable: true, droppable: true })
-          )
-        },
-        addChild: (parentId, name, id) => {
-          const newId = id ?? crypto.randomUUID()
-          setTree((prev) =>
-            addChild(prev, parentId, { id: newId, name, draggable: true, droppable: true })
-          )
-        },
-        remove: (id) => {
-          setTree((prev) => {
-            const next = cloneTree(prev)
-            removeNodeAndCollect(next, id)
-            return next
-          })
-        },
-        getTree: () => tree,
-      }),
-      [tree]
-    )
-
-    return (
-      <TreeView
-        data={withActions(tree)}
-        onDocumentDrag={(source, target) => {
-          if (!target.id) return
-          setTree((prev) => {
-            // simple “move as child”:
-            console.log("moving stuff")
-            const next = cloneTree(prev)
-            const removed = removeNodeAndCollect(next, source.id)
-            if (!removed) return next
-            const tgt = findNode(next, target.id)
-            if (!tgt) return next
-            if (tgt.children != null) {
-              tgt.children = tgt.children.concat(removed)
-            } else {
-              tgt.children = removed
-            }
-            tgt.droppable = true
-            tgt.draggable = true
-            return next
-          })
-        }}
-      />
-    )
-  }
-)
-
-DraggableTree.displayName = "DraggableTree"
-export default DraggableTree
+      }
+    />
+  )
+}
 

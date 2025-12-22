@@ -1,0 +1,5 @@
+da:
+  components:
+    currency_input:
+      label: "Beløb"
+      muted_text: "Indtast beløb i danske kroner"

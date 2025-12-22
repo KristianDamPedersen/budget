@@ -9,37 +9,41 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table"
+import { BudgetCategory } from '@/pages/budget/create/index.tsx'
 
 type BudgetItemRow = BudgetItem & {
   first_occurence_formatted: string
+  category_string: string
 }
 export type BudgetItemTableProps = {
   i18n: I18nNode
   data: BudgetItem[]
+  categories: BudgetCategory[]
+  setData: (items: BudgetItem[]) => void
 }
 
 export function BudgetItemTable(Props: BudgetItemTableProps): ReactElement {
 
-  const { i18n, data } = Props
+  const { i18n, data, categories, setData } = Props
   const [formatted, setFormatted] = useState<BudgetItemRow[]>([])
 
   useEffect(() => {
 
     let rows: BudgetItemRow[] = data.map(x => ({
       ...x,
+      category_string: categories.find((bc: BudgetCategory) => bc.id == x.category_id)?.name ?? x.category_id.toString(),
       first_occurence_formatted: new Date(x.first_occurence).toLocaleDateString("da"),
     }));
-
+    console.log("setting table")
     setFormatted(rows)
   }, [data])
-  console.log(formatted)
   const columns: ColumnDef<BudgetItemRow>[] = [
     {
       accessorKey: "name",
       header: i18n_t(i18n, "common.name")
     },
     {
-      accessorKey: "category_id",
+      accessorKey: "category_string",
       header: i18n_t(i18n, "entities.category.label")
     },
     {

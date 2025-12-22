@@ -8,9 +8,9 @@ import { i18n_t, I18nNode } from '@/lib/utils'
 import { TreeDataItem, TreeView } from '@/components/tree-view'
 import { set } from 'react-hook-form'
 import { Separator } from '@radix-ui/react-separator'
-import DraggableTree, { DraggableTreeHandle, DraggableTreeItem, DraggableTreeProps } from '@/components/Draggable-tree'
+import { DraggableTree, DraggableTreeItem, DraggableTreeProps } from '@/components/Draggable-tree'
 import { Circle } from 'lucide-react'
-import { BudgetItemTable } from '@/components/budget/BudgetItemTable'
+import { BudgetItemTable, BudgetItemTableProps } from '@/components/budget/BudgetItemTable'
 import { BudgetItem } from '@/types/budget/BudgetItem'
 import { CreateBudgetItemPopUp } from '@/components/budget/CreateBudgetItemPopUp'
 
@@ -86,27 +86,43 @@ export default function CreateBudget() {
     category_field_legend,
     category_field_description,
     budget_item_legend } = (usePage().props as unknown) as CreateBudgetProps
-
+  const [items, setItems] = useState<BudgetItem[]>([])
   const currentId = useRef<number>(0)
-  const [categoryTree, setCategoryTree] = useState<DraggableTreeItem[]>([])
-  const treeRef = useRef<DraggableTreeHandle>(null)
+  const [categoryTree, setCategoryTree] = useState<TreeDataItem[]>([])
+  const [flattenedCategoryTree, setFlattenedCategoryTree] = useState<BudgetCategory[]>([])
   const [pendingCategoryName, SetPendingCategoryName] = useState<string>("")
   const form = useForm({
     name: '',
     categories: default_categories
   })
 
-
+  function AddItem(item: BudgetItem) {
+    setItems(prev => [...prev, item])
+  }
   useEffect(() => {
     console.log(default_categories)
-    let tree: DraggableTreeItem[] = []
-
+    let tree: TreeDataItem[] = []
     for (const [key, value] of Object.entries(default_categories)) {
-      tree.push({ name: value.name, id: value.id.toString() })
+      tree.push({ name: value.name, id: value.id.toString(), draggable: true, droppable: true })
+      currentId.current++
     }
     setCategoryTree(tree)
+    var flattened = flattenTree(tree, null)
+    setFlattenedCategoryTree(flattened)
 
   }, [default_categories])
+
+  function flattenTree(elements: TreeDataItem[], parentId: string | null): BudgetCategory[] {
+    // walks the root elements
+    let items: BudgetCategory[] = []
+    for (let i = 0; i < elements.length; i++) {
+      items.push({ id: elements[i].id, name: elements[i].name, parent_id: parentId })
+      if (elements[i].children != undefined && elements[i].children!.length > 0) {
+        items.push(...flattenTree(elements[i].children!, elements[i].id))
+      }
+    }
+    return items
+  }
   function onSubmit(e: React.FormEvent) {
     e.preventDefault()
     form.post('/budget/create', {
@@ -116,17 +132,30 @@ export default function CreateBudget() {
 
   function AddPendingCategoryToTree(e) {
     e.preventDefault()
-    let tree = categoryTree
-    let newNode: DraggableTreeItem = {
+    let newNode: TreeDataItem = {
       name: pendingCategoryName,
       id: currentId.current.toString(),
+      droppable: true,
+      draggable: true
     }
     currentId.current++
-    tree.push(newNode)
-    SetPendingCategoryName("")
-    treeRef.current?.addRoot(newNode.name, newNode.id)
-    console.log(treeRef.current?.getTree())
+    SetPendingCategoryName('')
+    setCategoryTree(prev => {
+      let newTree = [...prev, newNode]
+      var flattened = flattenTree(newTree, null)
+      setFlattenedCategoryTree(flattened)
+      return newTree
+    }
+    )
+
   }
+
+  function updateTree(treeItems: TreeDataItem[]) {
+    setCategoryTree(treeItems)
+    var flattened = flattenTree(treeItems, null)
+    setFlattenedCategoryTree(flattened)
+  }
+
   return (
     <div>
       <div className="flex flex-col gap-y-6 m-md px-4 pb-4 max-w-md">
@@ -149,12 +178,24 @@ export default function CreateBudget() {
                   value={pendingCategoryName}
                 ></Input>
                 <Button onClick={AddPendingCategoryToTree}>{i18n_t(i18n, "common.add")}</Button>
-                <DraggableTree ref={treeRef} data={categoryTree} i18n={i18n} />
+                <DraggableTree
+                  localisedDeleteText={i18n_t(i18n, "common.delete")}
+                  setData={updateTree}
+                  data={categoryTree} />
               </FieldSet>
               <FieldSet>
                 <FieldLegend>{budget_item_legend}</FieldLegend>
-                <CreateBudgetItemPopUp i18n={i18n} categories={categoryTree ?? []} />
-                <BudgetItemTable data={budgetItems} i18n={i18n} />
+                <CreateBudgetItemPopUp
+                  i18n={i18n}
+                  onSubmit={AddItem}
+                  cadenceTypes={["daglig", "ugentlig", "månedlig", "kvartalvis", "halvårlig", "årlig", "engangs"]}
+                  categories={flattenedCategoryTree}
+                  itemTypes={["Fast udgift", "forbrugs mål"]} />
+                <BudgetItemTable
+                  data={items}
+                  setData={setItems}
+                  categories={flattenedCategoryTree}
+                  i18n={i18n} />
               </FieldSet>
             </FieldSet>
             <Button disabled={form.processing} type="submit">{i18n_t(i18n, "common.create")}</Button>

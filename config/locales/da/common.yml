@@ -9,3 +9,4 @@ da:
     name: "navn"
     currency: "valuta"
     value: "Værdi"
+    default_local_currency: "dkk"
