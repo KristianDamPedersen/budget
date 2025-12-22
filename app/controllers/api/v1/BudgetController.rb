@@ -1,5 +1,5 @@
 class Api::V1::BudgetController < InertiaController
-  self.inertia_i18n_scopes = [ "common", "entities.budget_item", "entities.category" ]
+  self.inertia_i18n_scopes = [ "common", "entities.budget_item", "entities.category", "components.create_budget_item_popup" ]
     def create_page
       render inertia: "budget/create/index", props: {
         title: I18n.t("pages.budget.create.title"),

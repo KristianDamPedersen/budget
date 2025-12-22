@@ -12,6 +12,7 @@ import DraggableTree, { DraggableTreeHandle, DraggableTreeItem, DraggableTreePro
 import { Circle } from 'lucide-react'
 import { BudgetItemTable } from '@/components/budget/BudgetItemTable'
 import { BudgetItem } from '@/types/budget/BudgetItem'
+import { CreateBudgetItemPopUp } from '@/components/budget/CreateBudgetItemPopUp'
 
 const budgetItems: BudgetItem[] = [
   {
@@ -54,7 +55,7 @@ const budgetItems: BudgetItem[] = [
     updated_at: new Date("2025-03-01T12:20:00Z"),
   },
 ]
-type BudgetCategory = {
+export type BudgetCategory = {
   name: string
   parent_id: string | null
   id: string | number
@@ -129,7 +130,7 @@ export default function CreateBudget() {
   return (
     <div>
       <div className="flex flex-col gap-y-6 m-md px-4 pb-4 max-w-md">
-        <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl md:text-6xl p-6 ">{title}</h1>
+        <h1 className="text-4xl font-bold tracking-tight">{title}</h1>
         <form onSubmit={onSubmit}>
           <FieldGroup>
             <FieldSet>
@@ -152,6 +153,7 @@ export default function CreateBudget() {
               </FieldSet>
               <FieldSet>
                 <FieldLegend>{budget_item_legend}</FieldLegend>
+                <CreateBudgetItemPopUp i18n={i18n} categories={categoryTree ?? []} />
                 <BudgetItemTable data={budgetItems} i18n={i18n} />
               </FieldSet>
             </FieldSet>

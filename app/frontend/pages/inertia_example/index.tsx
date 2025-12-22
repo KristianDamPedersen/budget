@@ -3,6 +3,7 @@ import { usePage } from '@inertiajs/react'
 import cs from './index.module.css'
 import { Button } from '@/components/ui/button'
 import { i18n_t } from '@/lib/utils'
+import { ModeToggle } from '@/components/ui/mode-toggle'
 
 export default function InertiaExample() {
   const { i18n, green_text } = usePage().props
