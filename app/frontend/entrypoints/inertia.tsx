@@ -1,5 +1,6 @@
 // app/frontend/entrypoints/inertia.ts
 import { config, createInertiaApp } from '@inertiajs/react'
+import { ThemeProvider } from '@/components/providers/theme-provider'
 import { createElement, ReactNode } from 'react'
 import { createRoot, hydrateRoot } from 'react-dom/client'
 // Temporary type definition, until @inertiajs/react provides one
@@ -44,6 +45,11 @@ createInertiaApp({
 
     const app = createElement(App, props)
 
+    const appWithContext = (<>
+      <ThemeProvider>
+        {app}
+      </ThemeProvider>
+    </>)
     // Prefer using the dedicated flag if present:
     // Inertia-Rails adds data-server-rendered="true" on SSR roots.
     const isServerRendered =
@@ -51,10 +57,10 @@ createInertiaApp({
 
     if (isServerRendered) {
       // Hydrate only when we actually have SSR markup
-      hydrateRoot(el, app)
+      hydrateRoot(el, appWithContext)
     } else {
       // Plain client-side render
-      createRoot(el).render(app)
+      createRoot(el).render(appWithContext)
     }
   },
 })

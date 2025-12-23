@@ -1,3 +1,4 @@
+import { ThemeProvider } from '@/components/providers/theme-provider'
 import { createInertiaApp } from '@inertiajs/react'
 import createServer from '@inertiajs/react/server'
 import ReactDOMServer from 'react-dom/server'
@@ -10,6 +11,12 @@ createServer((page) =>
       const pages = import.meta.glob('../pages/**/*.tsx', { eager: true })
       return pages[`../pages/${name}.tsx`]
     },
-    setup: ({ App, props }) => <App {...props} />,
+    setup: ({ App, props }) => {
+      return (<>
+        <ThemeProvider>
+          <App {...props} />
+        </ThemeProvider>
+      </>)
+    },
   }),
 )

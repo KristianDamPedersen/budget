@@ -1,0 +1,12 @@
+da:
+  common:
+    continue: "fortsæt"
+    cancel: "annuller"
+    create: "opret"
+    select: "vælg"
+    add: "tilføj"
+    delete: "slet"
+    name: "navn"
+    currency: "valuta"
+    value: "Værdi"
+    default_local_currency: "dkk"

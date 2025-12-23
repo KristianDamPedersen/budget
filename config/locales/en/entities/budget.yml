@@ -1,0 +1,13 @@
+en:
+  entities:
+    budget:
+      default_categories:
+        food:
+          name: "food"
+          id: 0
+        housing:
+          name: "housing"
+          id: 1
+        insurance:
+          name: "insurance"
+          id: 2

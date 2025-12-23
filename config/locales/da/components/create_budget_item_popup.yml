@@ -1,0 +1,5 @@
+da:
+  components:
+    create_budget_item_popup:
+      title: "Ny budget post"
+      description: "Opret en ny budget post"

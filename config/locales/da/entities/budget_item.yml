@@ -1,0 +1,8 @@
+da:
+  entities:
+    budget_item:
+      label: "post"
+      plural: "poster"
+      type: "type"
+      cadence: "hyppighed"
+      first_occurence: "Start dato"

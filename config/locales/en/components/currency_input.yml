@@ -1,0 +1,5 @@
+en:
+  components:
+    currency_input:
+      label: "Amount"
+      muted_text: "Write the amount in USD"

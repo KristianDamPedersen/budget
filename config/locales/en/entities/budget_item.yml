@@ -1,0 +1,8 @@
+en:
+  entities:
+    budget_item:
+      label: "item"
+      plural: "items"
+      type: "type"
+      cadence: "cadence"
+      first_occurence: "first occurence"
