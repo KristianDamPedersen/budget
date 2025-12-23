@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { i18n_t, I18nNode } from "@/lib/utils"
-import { SelectContent, Select, Select, SelectTrigger, SelectValue, SelectItem } from "../ui/select"
+import { SelectContent, Select, SelectTrigger, SelectValue, SelectItem } from "../ui/select"
 import { DraggableTreeItem } from "../Draggable-tree"
 import { Field, FieldGroup, FieldLabel, FieldSet } from "../ui/field"
 import { BudgetCategory } from "@/pages/budget/create"
