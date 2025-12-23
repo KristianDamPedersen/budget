@@ -6,16 +6,9 @@ import { Button } from "@/components/ui/button"
 
 import { router, usePage } from '@inertiajs/react'
 
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination"
 import { useState, useEffect } from "react"
+import { Pagination } from "@/components/ui/pagination"
+import { PaginationWithState } from "@/components/ui/PaginationWithState"
 
 export type BudgetOverviewPageProps = {
   budgets: BudgetSimple[]
@@ -28,9 +21,6 @@ export type BudgetOverviewPageProps = {
 export default function BudgetOverviewPage() {
   const { pageNo, perPage, totalPages, budgets, title, i18n } = (usePage().props as unknown) as BudgetOverviewPageProps
   const [activePagenumber, setActivePageNumber] = useState<number>(pageNo)
-  const [firstElemValue, setFirstElemValue] = useState<number>(pageNo)
-  const [secondElemValue, setSecondElemValue] = useState<number>(pageNo)
-  const [thirdElemValue, setThirdElemValue] = useState<number>(pageNo)
   function goToPage(page: number): void {
     router.get(
       "/budget",                    // <-- your route for index
@@ -43,28 +33,7 @@ export default function BudgetOverviewPage() {
       }
     )
   }
-  useEffect(() => {
-    setActivePageNumber(pageNo)
-    console.log(totalPages)
-  }
-    , [])
-  useEffect(() => {
-    if (activePagenumber == totalPages) {
-      setFirstElemValue(activePagenumber - 2)
-      setSecondElemValue(activePagenumber - 1)
-      setThirdElemValue(activePagenumber)
-    } else if (activePagenumber <= 1) {
-      setFirstElemValue(activePagenumber)
-      setSecondElemValue(activePagenumber + 1)
-      setThirdElemValue(activePagenumber + 2)
-    } else {
-      setFirstElemValue(activePagenumber - 1)
-      setSecondElemValue(activePagenumber)
-      setThirdElemValue(activePagenumber + 1)
-    }
-    goToPage(activePagenumber)
-  }
-    , [activePagenumber])
+
   return (
     <div>
       <NavBar />
@@ -83,64 +52,12 @@ export default function BudgetOverviewPage() {
           </Item>
         )
       })}
+      <PaginationWithState
+        onActivePageChange={goToPage}
+        initialPageNum={pageNo}
+        perPage={perPage}
+        totalPages={totalPages} />
 
-      <Pagination>
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious onClick={() => {
-              if (activePagenumber > 1) {
-                setActivePageNumber(prev => prev - 1)
-              }
-            }} />
-
-          </PaginationItem>
-          {firstElemValue > 0 &&
-            <PaginationItem>
-              <PaginationLink
-                isActive={activePagenumber == firstElemValue}
-                onClick={() => {
-                  if (firstElemValue != activePagenumber)
-                    setActivePageNumber(firstElemValue)
-                }}>
-                {firstElemValue}</PaginationLink>
-            </PaginationItem>
-          }
-          {secondElemValue <= totalPages &&
-            <PaginationItem>
-              <PaginationLink
-                isActive={activePagenumber == secondElemValue}
-                onClick={() => {
-                  if (secondElemValue != activePagenumber)
-                    setActivePageNumber(secondElemValue)
-                }}>
-                {secondElemValue}
-              </PaginationLink>
-            </PaginationItem>
-          }
-          {thirdElemValue <= totalPages &&
-            <PaginationItem>
-              <PaginationLink
-                isActive={activePagenumber == thirdElemValue}
-                onClick={() => {
-                  if (thirdElemValue != activePagenumber)
-                    setActivePageNumber(thirdElemValue)
-                }}>
-                {thirdElemValue}
-              </PaginationLink>
-            </PaginationItem>
-          }
-          <PaginationItem>
-            <PaginationEllipsis />
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationNext onClick={() => {
-              if (activePagenumber < totalPages) {
-                setActivePageNumber(prev => prev + 1)
-              }
-            }} />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
     </div>
 
   )
