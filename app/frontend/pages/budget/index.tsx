@@ -34,14 +34,20 @@ export default function BudgetOverviewPage() {
       }
     )
   }
+  function goToCreate() {
+    router.get("/budget/create")
+  }
 
   return (
     <div>
       <NavBar />
-      <h1 className="text-4xl mb-8 mt-4">{title}</h1>
+      <div className="grid grid-cols-4 mt-4 mb-8 items-center px-2">
+        <h1 className="text-4xl col-start-1">{title}</h1>
+        <Button size="sm" className="col-start-4 align-center" onClick={goToCreate}>{i18n_t(i18n, "common.create")}</Button>
+      </div>
       {budgets.map(budget => {
         return (
-          <Item variant="outline" className="my-2">
+          <Item variant="outline" className="mb-2">
             <ItemContent>
               <ItemTitle>{budget.name}</ItemTitle>
             </ItemContent>

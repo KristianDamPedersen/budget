@@ -14,6 +14,7 @@ import { BudgetItemTable, BudgetItemTableProps } from '@/components/budget/Budge
 import { BudgetItem, BudgetItemRequest } from '@/types/budget/BudgetItem'
 import { CreateBudgetItemPopUp, CreateBudgetItemPopUpProps } from '@/components/budget/CreateBudgetItemPopUp'
 import { BudgetCategory } from '@/types/budget/BudgetCategory'
+import { NavBar } from '@/components/nav-bar'
 
 type CreateBudgetProps = {
 
@@ -134,6 +135,7 @@ export default function CreateBudget() {
 
   return (
     <div>
+      <NavBar />
       <div className="flex flex-col gap-y-6 m-md px-4 pb-4 max-w-md">
         <h1 className="text-4xl font-bold tracking-tight">{title}</h1>
         <form onSubmit={onSubmit}>
