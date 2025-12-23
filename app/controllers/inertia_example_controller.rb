@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# DEPCRECATED: Should be removed
 class InertiaExampleController < InertiaController
   self.inertia_i18n_scopes = [ "pages.inertia_example" ]
   def index

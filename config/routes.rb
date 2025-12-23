@@ -18,4 +18,10 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
+  #
+  namespace :auth do
+    get "login", to: "sessions#new"
+    get "callback", to: "sessions#callback"
+  end
+  delete "logout", to: "auth/sessions#destroy"
 end

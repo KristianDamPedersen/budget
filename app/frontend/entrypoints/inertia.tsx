@@ -1,15 +1,26 @@
 // app/frontend/entrypoints/inertia.ts
+import { config, createInertiaApp } from '@inertiajs/react'
 import { ThemeProvider } from '@/components/providers/theme-provider'
-import { createInertiaApp } from '@inertiajs/react'
 import { createElement, ReactNode } from 'react'
 import { createRoot, hydrateRoot } from 'react-dom/client'
-
 // Temporary type definition, until @inertiajs/react provides one
 type ResolvedComponent = {
   default: ReactNode
   layout?: (page: ReactNode) => ReactNode
 }
 
+// Handle CSRF token
+if (typeof document !== 'undefined') {
+  const csrf = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content
+
+  config.set('visitOptions', (_href, options) => ({
+    ...options,
+    headers: {
+      ...options.headers,
+      ...(csrf ? { 'X-CSRF-Token': csrf } : {}),
+    },
+  }))
+}
 createInertiaApp({
   resolve: (name) => {
     const pages = import.meta.glob<ResolvedComponent>('../pages/**/*.tsx', {
