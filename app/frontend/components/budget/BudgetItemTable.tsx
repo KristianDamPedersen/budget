@@ -29,6 +29,7 @@ export function BudgetItemTable(Props: BudgetItemTableProps): ReactElement {
 
   useEffect(() => {
 
+    console.log(data)
     let rows: BudgetItemRow[] = data.map(x => ({
       ...x,
       category_string: categories.find((bc: BudgetCategory) => bc.id == x.category_id)?.name ?? x.category_id.toString(),

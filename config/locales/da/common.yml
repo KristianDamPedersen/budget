@@ -11,3 +11,4 @@ da:
     value: "Værdi"
     default_local_currency: "dkk"
     open: "åben"
+    edit: "rediger"

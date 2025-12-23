@@ -13,8 +13,7 @@ class Api::V1::BudgetController < InertiaController
         name_field_legend: I18n.t("pages.budget.create.name_field_legend"),
         name_field_description: I18n.t("pages.budget.create.name_field_description"),
         name_field_placeholder: I18n.t("pages.budget.create.name_field_placeholder"),
-        category_field_legend: I18n.t("pages.budget.create.category_field_legend"),
-        category_field_placeholder: I18n.t("pages.budget.create.category_field_placeholder"),
+        category_field_placeholer: I18n.t("pages.budget.create.category_field_placeholder"),
         category_field_description: I18n.t("pages.budget.create.category_field_description"),
         default_categories: I18n.t("entities.budget.default_categories"),
         budget_item_legend: I18n.t("entities.budget_item.plural")
@@ -29,8 +28,16 @@ class Api::V1::BudgetController < InertiaController
       perPage: per_page,
       pageNo: page_no,
       locale: I18n.locale,
-      totalPages: budgets.totalEntries / per_page
+      totalPages: (budgets.totalEntries.to_f/per_page).ceil
 
+    }
+  end
+
+  def byId
+    req = Budget::UseCases::GetById::Request.new(params[:id])
+    budget =  Budget::UseCases::GetById.new.call(req)
+    render inertia: "budget/single/index", props: {
+      budget: budget
     }
   end
   def create

@@ -10,5 +10,6 @@ export type Budget = {
 
 
 export type BudgetSimple = {
+  id: string
   name: string
 }

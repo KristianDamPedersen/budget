@@ -38,6 +38,10 @@ export default function BudgetOverviewPage() {
     router.get("/budget/create")
   }
 
+
+  function goToBudgetPage(id: string) {
+    router.get(`/budget/${id}`)
+  }
   return (
     <div>
       <NavBar />
@@ -54,6 +58,7 @@ export default function BudgetOverviewPage() {
             <ItemActions>
               <Button
                 variant="outline"
+                onClick={() => goToBudgetPage(budget.id)}
                 size="sm">{i18n_t(i18n, "common.open")}</Button>
             </ItemActions>
           </Item>
