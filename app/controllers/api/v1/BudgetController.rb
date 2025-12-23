@@ -1,4 +1,5 @@
 class Api::V1::BudgetController < InertiaController
+  include Pagination
   self.inertia_i18n_scopes = [
     "common",
     "entities.budget_item",
@@ -6,7 +7,7 @@ class Api::V1::BudgetController < InertiaController
     "components.create_budget_item_popup",
     "components.currency_input"
    ]
-    def create_page
+   def create_page
       render inertia: "budget/create/index", props: {
         title: I18n.t("pages.budget.create.title"),
         name_field_legend: I18n.t("pages.budget.create.name_field_legend"),
@@ -15,11 +16,22 @@ class Api::V1::BudgetController < InertiaController
         category_field_legend: I18n.t("pages.budget.create.category_field_legend"),
         category_field_placeholder: I18n.t("pages.budget.create.category_field_placeholder"),
         category_field_description: I18n.t("pages.budget.create.category_field_description"),
-      default_categories: I18n.t("entities.budget.default_categories"),
+        default_categories: I18n.t("entities.budget.default_categories"),
         budget_item_legend: I18n.t("entities.budget_item.plural")
     }
-    end
+   end
+  def index
+    req = Budget::UseCases::GetAllBudgetsSimple::Request.new(paginate)
+    budgets = Budget::UseCases::GetAllBudgetsSimple.new.call(req)
+    render inertia: "budget/index", props: {
+      title: I18n.t("pages.budget.index.title"),
+      budgets: budgets.budgets,
+      perPage: per_page,
+      pageNo: page_no,
+      totalPages: budgets.totalEntries / per_page
 
+    }
+  end
   def create
     req = Budget::UseCases::CreateBudget::Request.new(
       name: budget_params[:name],

@@ -1,7 +1,7 @@
 module Budget
   module UseCases
     class CreateBudget
-    Request = Data.define(:name, :owned_by, :categories, :items)
+      Request = Data.define(:name, :owned_by, :categories, :items)
       Response = Data.define(:name, :owned_by, :budget_categories, :items)
       INTERVAL_MAP = {
         "daglig"   => 1.days,
