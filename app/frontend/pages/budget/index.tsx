@@ -9,19 +9,19 @@ import { router, usePage } from '@inertiajs/react'
 import { useState, useEffect } from "react"
 import { Pagination } from "@/components/ui/pagination"
 import { PaginationWithState } from "@/components/ui/PaginationWithState"
+import { DivideCircle } from "lucide-react"
 
 export type BudgetOverviewPageProps = {
   budgets: BudgetSimple[]
   title: string
-  locale: string
   i18n: I18nNode
+  locale: string
   pageNo: number
   perPage: number
   totalPages: number
 }
 export default function BudgetOverviewPage() {
-  const { pageNo, locale, perPage, totalPages, budgets, title, i18n } = (usePage().props as unknown) as BudgetOverviewPageProps
-  const [activePagenumber, setActivePageNumber] = useState<number>(pageNo)
+  const { pageNo, i18n, locale, perPage, totalPages, budgets, title } = (usePage().props as unknown) as BudgetOverviewPageProps
   function goToPage(page: number): void {
     router.get(
       "/budget",                    // <-- your route for index
@@ -38,10 +38,10 @@ export default function BudgetOverviewPage() {
   return (
     <div>
       <NavBar />
-      <h1 className="text-4xl">{title}</h1>
+      <h1 className="text-4xl mb-8 mt-4">{title}</h1>
       {budgets.map(budget => {
         return (
-          <Item>
+          <Item variant="outline" className="my-2">
             <ItemContent>
               <ItemTitle>{budget.name}</ItemTitle>
             </ItemContent>

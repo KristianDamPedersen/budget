@@ -11,5 +11,3 @@ da:
     value: "Værdi"
     default_local_currency: "dkk"
     open: "åben"
-    next: "næste"
-    previous: "tidligere"
