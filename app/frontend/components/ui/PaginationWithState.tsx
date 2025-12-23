@@ -9,16 +9,19 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
+import { i18n_t, I18nNode } from "@/lib/utils"
 
 
 export type PaginationWithStateProps = {
   onActivePageChange: (page: number) => void
   totalPages: number
+  previousLocalized: string,
+  nextLocalized: string,
   initialPageNum: number
   perPage: number
 }
 export function PaginationWithState(Props: PaginationWithStateProps) {
-  const { onActivePageChange, totalPages, initialPageNum, perPage } = Props
+  const { onActivePageChange, i18n, totalPages, initialPageNum, perPage, nextLocalized, previousLocalized } = Props
   const [activePagenumber, setActivePageNumber] = useState<number>(0)
   const [firstElemValue, setFirstElemValue] = useState<number>(0)
   const [secondElemValue, setSecondElemValue] = useState<number>(0)

@@ -13,23 +13,24 @@ import { PaginationWithState } from "@/components/ui/PaginationWithState"
 export type BudgetOverviewPageProps = {
   budgets: BudgetSimple[]
   title: string
+  locale: string
   i18n: I18nNode
   pageNo: number
   perPage: number
   totalPages: number
 }
 export default function BudgetOverviewPage() {
-  const { pageNo, perPage, totalPages, budgets, title, i18n } = (usePage().props as unknown) as BudgetOverviewPageProps
+  const { pageNo, locale, perPage, totalPages, budgets, title, i18n } = (usePage().props as unknown) as BudgetOverviewPageProps
   const [activePagenumber, setActivePageNumber] = useState<number>(pageNo)
   function goToPage(page: number): void {
     router.get(
       "/budget",                    // <-- your route for index
-      { page, per_page: perPage },  // query params Rails reads
+      { page, per_page: perPage, locale },  // query params Rails reads
       {
         preserveScroll: true,
         preserveState: true,        // keeps local UI state if you add any
         replace: true,              // avoids stacking history if you want
-        only: ["budgets", "pageNo"],// optional: partial reload (faster)
+        only: ["budgets", "pageNo", "totalPages"],// optional: partial reload (faster)
       }
     )
   }

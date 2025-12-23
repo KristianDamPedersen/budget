@@ -28,6 +28,7 @@ class Api::V1::BudgetController < InertiaController
       budgets: budgets.budgets,
       perPage: per_page,
       pageNo: page_no,
+      locale: I18n.locale,
       totalPages: budgets.totalEntries / per_page
 
     }
