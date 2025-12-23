@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# DEPCRECATED: Should be removed
 class InertiaExampleController < InertiaController
   def index
     render inertia: {
