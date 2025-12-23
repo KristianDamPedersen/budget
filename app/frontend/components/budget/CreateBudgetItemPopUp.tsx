@@ -30,6 +30,8 @@ export type CreateBudgetItemPopUpProps = {
   onSubmit: (item: BudgetItem) => void
 }
 export function CreateBudgetItemPopUp(Props: CreateBudgetItemPopUpProps) {
+
+
   const { i18n, categories, itemTypes, cadenceTypes, onSubmit } = Props;
   const [firstOccurence, setFirstOccurence] = useState<Date>(new Date(Date.now()))
   const [name, setName] = useState<string>("")
@@ -143,6 +145,7 @@ export function CreateBudgetItemPopUp(Props: CreateBudgetItemPopUpProps) {
             }
           }
           }
+          localizedCurrency={i18n_t(i18n, "common.default_local_currency")}
           localizedMutedText={i18n_t(i18n, "components.currency_input.muted_text")}
           localizedLabel={i18n_t(i18n, "components.currency_input.label")}
         />

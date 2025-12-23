@@ -1,0 +1,5 @@
+en:
+  components:
+    create_budget_item_popup:
+      title: "New budget item"
+      description: "Create a new budget item."

@@ -6,3 +6,6 @@ en:
         name_field_legend: "Name"
         name_field_description: "The name is used to identify the budget."
         name_field_placeholder: "My first budget"
+        category_field_legend: "Categories"
+        category_field_description: "Add or remove categories"
+        category_field_placeholder: "Rent"

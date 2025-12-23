@@ -8,10 +8,11 @@ import { Label } from "./label";
 export type CurrencyInputProps = {
   localizedMutedText: string
   localizedLabel: string
+  localizedCurrency: string
   onInputValueChange: (value: number | undefined) => void
 }
 export function CurrencyInput(Props: CurrencyInputProps) {
-  const { onInputValueChange, localizedLabel, localizedMutedText } = Props
+  const { onInputValueChange, localizedLabel, localizedMutedText, localizedCurrency } = Props
 
   function handleinput(e) {
     let parsed = Number.parseFloat(e.target.value)
@@ -34,7 +35,7 @@ export function CurrencyInput(Props: CurrencyInputProps) {
           type="number"
         />
 
-        <p className="absolute top-1.5 right-1/4 h-4 w-4 text-muted-foreground">dkk</p>
+        <p className="absolute top-1.5 right-1/4 h-4 w-4 text-muted-foreground">{localizedCurrency}</p>
       </div>
       <p className="text-muted-foreground text-xs">{localizedMutedText}</p>
     </div>

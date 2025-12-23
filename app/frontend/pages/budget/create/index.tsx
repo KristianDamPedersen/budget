@@ -13,14 +13,10 @@ import { Circle } from 'lucide-react'
 import { BudgetItemTable, BudgetItemTableProps } from '@/components/budget/BudgetItemTable'
 import { BudgetItem, BudgetItemRequest } from '@/types/budget/BudgetItem'
 import { CreateBudgetItemPopUp, CreateBudgetItemPopUpProps } from '@/components/budget/CreateBudgetItemPopUp'
+import { BudgetCategory } from '@/types/budget/BudgetCategory'
 
-export type BudgetCategory = {
-  name: string
-  parent_id: string | null
-  id: string | number
-
-}
 type CreateBudgetProps = {
+
   title: string
   name_field_legend: string
   name_field_description: string

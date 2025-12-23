@@ -9,7 +9,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { BudgetCategory } from '@/pages/budget/create/index.tsx'
+import { BudgetCategory } from '@/types/budget/BudgetCategory.tsx'
 
 type BudgetItemRow = BudgetItem & {
   first_occurence_formatted: string

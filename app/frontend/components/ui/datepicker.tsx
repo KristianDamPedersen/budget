@@ -24,6 +24,18 @@ export function DatePicker(props: DatePickerProps) {
   const [date, setDate] = React.useState<Date | undefined>(new Date(Date.now()))
 
 
+  const today = new Date()
+
+  const startMonth = new Date(today.getFullYear() - 5, today.getMonth(), 1)
+  const endMonth = new Date(today.getFullYear() + 5, today.getMonth(), 1)
+
+  // optional: if you want to restrict actual selectable days too
+  const minDate = new Date(today)
+  minDate.setFullYear(today.getFullYear() - 5)
+
+  const maxDate = new Date(today)
+  maxDate.setFullYear(today.getFullYear() + 5)
+
   React.useEffect(() => {
     onDateChange(date)
   }, [date])
@@ -48,8 +60,11 @@ export function DatePicker(props: DatePickerProps) {
           mode="single"
           selected={date}
           captionLayout="dropdown"
-          onSelect={(date) => {
-            setDate(date)
+          startMonth={startMonth}
+          endMonth={endMonth}
+          disabled={{ before: minDate, after: maxDate }} // optional
+          onSelect={(d) => {
+            setDate(d)
             setOpen(false)
           }}
         />
