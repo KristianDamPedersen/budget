@@ -51,11 +51,10 @@ class Auth::SessionsController < ApplicationController
     )
 
     # store_workos_session_id(auth_response.access_token)
-
     workos_user = auth_response.user
 
     # Check for email verifiaction before we create the user in the database
-    unless workos_user.respon_to?(:email_verified) && workos_user.email_verified
+    unless workos_user.respond_to?(:email_verified) && workos_user.email_verified
       return redirect_to root_path, alert: "Email is not verified"
     end
 
