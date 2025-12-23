@@ -6,3 +6,10 @@ da:
       type: "type"
       cadence: "hyppighed"
       first_occurence: "Start dato"
+      cadences:
+        daily: "daglig"
+        weekly: "ugentlig"
+        monthly: "månedlig"
+        quarterly: "kvartalvis"
+        biannual: "Halvårlig"
+        yearly: "årlig"

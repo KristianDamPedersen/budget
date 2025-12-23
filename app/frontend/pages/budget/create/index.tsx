@@ -15,6 +15,7 @@ import { BudgetItem, BudgetItemRequest } from '@/types/budget/BudgetItem'
 import { CreateBudgetItemPopUp, CreateBudgetItemPopUpProps } from '@/components/budget/CreateBudgetItemPopUp'
 import { BudgetCategory } from '@/types/budget/BudgetCategory'
 import { NavBar } from '@/components/nav-bar'
+import { Cadence } from '@/types/budget/cadence'
 
 type CreateBudgetProps = {
 
@@ -27,6 +28,7 @@ type CreateBudgetProps = {
   category_field_description: string
   budget_item_legend: string
   i18n: I18nNode,
+  cadences: string[],
   default_categories: Record<string, BudgetCategory>
 }
 
@@ -46,7 +48,8 @@ export default function CreateBudget() {
     category_field_placeholder,
     category_field_legend,
     category_field_description,
-    budget_item_legend } = (usePage().props as unknown) as CreateBudgetProps
+    budget_item_legend,
+    cadences } = (usePage().props as unknown) as CreateBudgetProps
   const [items, setItems] = useState<BudgetItem[]>([])
   const currentId = useRef<number>(0)
   const [categoryTree, setCategoryTree] = useState<TreeDataItem[]>([])
@@ -166,7 +169,7 @@ export default function CreateBudget() {
                 <CreateBudgetItemPopUp
                   i18n={i18n}
                   onSubmit={AddItem}
-                  cadenceTypes={["daglig", "ugentlig", "månedlig", "kvartalvis", "halvårlig", "årlig"]}
+                  cadenceTypes={cadences}
                   categories={flattenedCategoryTree}
                   itemTypes={["Fast udgift", "forbrugs mål"]} />
                 <BudgetItemTable

@@ -8,6 +8,10 @@ class Api::V1::BudgetController < InertiaController
     "components.currency_input"
    ]
    def create_page
+      cadences =
+        I18n.t("entities.budget_item.cadences")
+        .keys
+
       render inertia: "budget/create/index", props: {
         title: I18n.t("pages.budget.create.title"),
         name_field_legend: I18n.t("pages.budget.create.name_field_legend"),
@@ -16,7 +20,8 @@ class Api::V1::BudgetController < InertiaController
         category_field_placeholer: I18n.t("pages.budget.create.category_field_placeholder"),
         category_field_description: I18n.t("pages.budget.create.category_field_description"),
         default_categories: I18n.t("entities.budget.default_categories"),
-        budget_item_legend: I18n.t("entities.budget_item.plural")
+        budget_item_legend: I18n.t("entities.budget_item.plural"),
+        cadences: cadences
     }
    end
   def index
