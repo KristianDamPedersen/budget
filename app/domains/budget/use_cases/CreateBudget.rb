@@ -1,15 +1,15 @@
 module Budget
   module UseCases
     class CreateBudget
-    Request = Data.define(:name, :owned_by, :categories, :items)
+       Request = Data.define(:name, :owned_by, :categories, :items)
       Response = Data.define(:name, :owned_by, :budget_categories, :items)
       INTERVAL_MAP = {
-        "daglig"   => 1.days,
-        "ugentlig" => 1.weeks,
-        "månedlig" => 1.months,
-        "årlig"    => 1.years,
-        "kvartalvis" => 3.months,
-        "halvårlig" => 6.months
+        0  => 1.days,
+        1 => 1.weeks,
+        2 => 1.months,
+        3    => 3.months,
+        4 => 6.months,
+        5 => 1.years
       }.freeze
       def call(request)
         budget = nil

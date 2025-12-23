@@ -20,7 +20,8 @@ import { BudgetCategory } from "@/pages/budget/create"
 import { DatePicker } from "../ui/datepicker"
 import { useState } from "react"
 import { CurrencyInput } from "../ui/InputWithCurrency"
-import { BudgetItem } from "@/types/budget/BudgetItem"
+import { BudgetItem, BudgetItemRequest } from "@/types/budget/BudgetItem"
+import { Cadence } from "@/types/budget/cadence"
 
 export type CreateBudgetItemPopUpProps = {
   i18n: I18nNode
@@ -41,20 +42,15 @@ export function CreateBudgetItemPopUp(Props: CreateBudgetItemPopUpProps) {
   const [value, setValue] = useState<number>(0)
   function handleSubmit(e) {
     e.preventDefault()
-    var item: BudgetItem = {
-      budget_id: "not set yet",
+    var item: BudgetItemRequest = {
       name: name,
-      created_by: "some rando",
-      category_id: selectedcategory,
+      category_id: selectedcategory.toString(),
       item_type: itemType,
       cadence: cadence,
       value: value,
       currency: "dkk",
       first_occurence: firstOccurence,
-      created_at: new Date(Date.now()),
-      updated_at: new Date(Date.now())
     }
-    console.log(item)
     onSubmit(item)
   }
   const i18n_prefix = "components.create_budget_item_popup."
@@ -122,7 +118,7 @@ export function CreateBudgetItemPopUp(Props: CreateBudgetItemPopUpProps) {
             </SelectTrigger>
             <SelectContent>
               {cadenceTypes.map((c: string) =>
-                <SelectItem value={c}>{c}</SelectItem>
+                <SelectItem value={c}>{i18n_t(i18n, `entities.budget_item.cadences.${c}`)}</SelectItem>
               )}
             </SelectContent>
           </Select>
