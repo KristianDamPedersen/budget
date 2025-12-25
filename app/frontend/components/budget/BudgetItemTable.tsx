@@ -1,4 +1,4 @@
-import { BudgetItem } from '../../types/budget/BudgetItem.tsx'
+import { BudgetItem, BudgetItemRequest } from '../../types/budget/BudgetItem.tsx'
 import { i18n_t, I18nNode } from '@/lib/utils'
 import { ReactElement, useEffect, useState } from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table.tsx'
@@ -10,6 +10,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 import { BudgetCategory } from '@/types/budget/BudgetCategory.tsx'
+import { Button } from '../ui/button.tsx'
 
 type BudgetItemRow = BudgetItem & {
   first_occurence_formatted: string
@@ -17,9 +18,9 @@ type BudgetItemRow = BudgetItem & {
 }
 export type BudgetItemTableProps = {
   i18n: I18nNode
-  data: BudgetItem[]
+  data: BudgetItemRequest[]
   categories: BudgetCategory[]
-  setData: (items: BudgetItem[]) => void
+  setData: (items: BudgetItemRequest[]) => void
 }
 
 export function BudgetItemTable(Props: BudgetItemTableProps): ReactElement {
@@ -38,6 +39,10 @@ export function BudgetItemTable(Props: BudgetItemTableProps): ReactElement {
     console.log("setting table")
     setFormatted(rows)
   }, [data])
+  function handleDelete(index: number) {
+    setData(data.filter((_, i) => i !== index))
+  }
+
   const columns: ColumnDef<BudgetItemRow>[] = [
     {
       accessorKey: "name",
@@ -49,11 +54,22 @@ export function BudgetItemTable(Props: BudgetItemTableProps): ReactElement {
     },
     {
       accessorKey: "item_type",
-      header: i18n_t(i18n, "entities.budget_item.type")
+      header: i18n_t(i18n, "entities.budget_item.type"),
+      cell: cell => {
+        const type = cell.getValue<string>()
+        return i18n_t(i18n, `entities.budget_item.item_types.${type}`)
+      }
+
+
     },
     {
       accessorKey: "cadence",
-      header: i18n_t(i18n, "entities.budget_item.cadence")
+      header: i18n_t(i18n, "entities.budget_item.cadence"),
+      cell: cell => {
+        const cadence = cell.getValue<string>()
+        return i18n_t(i18n, `entities.budget_item.cadences.${cadence}`)
+      }
+
     },
     {
       accessorKey: "first_occurence_formatted",
@@ -65,8 +81,23 @@ export function BudgetItemTable(Props: BudgetItemTableProps): ReactElement {
     },
     {
       accessorKey: "value",
-      header: i18n_t(i18n, "common.value")
-    }
+      header: i18n_t(i18n, "common.value"),
+    },
+    {
+      id: "actions",
+      header: "", // or i18n_t(i18n, "common.actions")
+      cell: ({ row }) => (
+        <div className="flex justify-end">
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => handleDelete(row.index)}
+          >
+            {i18n_t(i18n, "common.delete") ?? "Delete"}
+          </Button>
+        </div>
+      ),
+    },
   ]
   const table = useReactTable({
     data: formatted,

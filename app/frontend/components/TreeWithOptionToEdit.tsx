@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { TreeDataItem, TreeRenderItemParams, TreeView } from "./tree-view"
 import { Button } from "./ui/button"
-import { DraggableTree } from "./Draggable-tree"
+import { addChildToTree, DraggableTree } from "./Draggable-tree"
 import { i18n_t, I18nNode } from "@/lib/utils"
 import { CircleX, PencilIcon } from "lucide-react"
 import { BudgetCategory } from "@/types/budget/BudgetCategory"
@@ -10,8 +10,17 @@ export type TreeWithOptionToEditProps = {
   title: string
   localizedDeleteText: string
   items: TreeDataItem[]
+
   onSave: (items: TreeDataItem[]) => void
-  i18n: I18nNode
+  i18n: I18nNode,
+
+  // optional header to add/ remove
+  renderEditHeader?: (ctx: {
+    data: TreeDataItem[]
+    setData: React.Dispatch<React.SetStateAction<TreeDataItem[]>>
+    addRoot: (node: Omit<TreeDataItem, "children">) => void
+    addChild: (parentId: string, node: TreeDataItem) => void
+  }) => React.ReactNode
 }
 
 export function BudgetCategoriesToTree(
@@ -77,20 +86,22 @@ export function BudgetCategoriesToTree(
   return tree
 }
 
-
 export function TreeWithOptionToEdit(Props: TreeWithOptionToEditProps) {
-  const { onSave, title, items, i18n, localizedDeleteText } = Props
+  const { onSave, title, items, i18n, localizedDeleteText, renderEditHeader } = Props
   const [pendingData, setPendingData] = useState<TreeDataItem[]>(items)
   const [isEditing, setIsEditing] = useState(false)
 
   function StopEditing(shouldSave: boolean) {
     if (shouldSave) {
+      console.log("calling save")
       onSave(pendingData)
     }
-
-    setPendingData(items)
     setIsEditing(false)
   }
+
+  useEffect(() => {
+    setPendingData(items)
+  }, [items])
 
   function StartEditing() {
     var arr = items
@@ -110,23 +121,30 @@ export function TreeWithOptionToEdit(Props: TreeWithOptionToEditProps) {
       <h1 className="text-2xl">{title}</h1>
       {isEditing ? (
         <div className="flex-col mt-4">
-          <Button onClick={() => StopEditing(false)}>
-            <span>
-              <CircleX />
-            </span>{i18n_t(i18n, "common.cancel")}</Button>
+          {renderEditHeader?.({
+            data: pendingData,
+            setData: setPendingData,
+            addRoot: (root => setPendingData(prev => [...prev, root])),
+            addChild: ((parentid, child) => {
+              let next = addChildToTree(pendingData, parentid, child)
+              setPendingData(next)
+            })
+          })}
+
           <DraggableTree
             data={pendingData}
             setData={setPendingData}
             localisedDeleteText={localizedDeleteText}>
           </DraggableTree>
+          <Button className="mr-2" variant="secondary" onClick={() => StopEditing(false)}>
+            <span>
+              <CircleX />
+            </span>{i18n_t(i18n, "common.cancel")}</Button>
+
           <Button onClick={() => { StopEditing(true) }}>{i18n_t(i18n, "common.save")}</Button>
         </div >
       ) : (
         <div className="flex-col">
-          <Button onClick={() => StartEditing()}>
-            <span>
-              <PencilIcon />
-            </span>{i18n_t(i18n, "common.edit")}</Button>
           <TreeView
             data={items}
             renderItem={
@@ -138,6 +156,11 @@ export function TreeWithOptionToEdit(Props: TreeWithOptionToEditProps) {
               )
             }
           />
+
+          <Button onClick={() => StartEditing()}>
+            <span>
+              <PencilIcon />
+            </span>{i18n_t(i18n, "common.edit")}</Button>
         </div>
 
       )

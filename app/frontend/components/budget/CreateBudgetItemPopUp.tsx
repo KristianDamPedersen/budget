@@ -16,19 +16,19 @@ import { i18n_t, I18nNode } from "@/lib/utils"
 import { SelectContent, Select, SelectTrigger, SelectValue, SelectItem } from "../ui/select"
 import { DraggableTreeItem } from "../Draggable-tree"
 import { Field, FieldGroup, FieldLabel, FieldSet } from "../ui/field"
-import { BudgetCategory } from "@/pages/budget/create"
 import { DatePicker } from "../ui/datepicker"
 import { useState } from "react"
 import { CurrencyInput } from "../ui/InputWithCurrency"
 import { BudgetItem, BudgetItemRequest } from "@/types/budget/BudgetItem"
 import { Cadence } from "@/types/budget/cadence"
+import { BudgetCategory } from "@/types/budget/BudgetCategory"
 
 export type CreateBudgetItemPopUpProps = {
   i18n: I18nNode
   categories: BudgetCategory[]
   itemTypes: string[]
   cadenceTypes: string[]
-  onSubmit: (item: BudgetItem) => void
+  onSubmit: (item: BudgetItemRequest) => void
 }
 export function CreateBudgetItemPopUp(Props: CreateBudgetItemPopUpProps) {
 
@@ -43,6 +43,7 @@ export function CreateBudgetItemPopUp(Props: CreateBudgetItemPopUpProps) {
   function handleSubmit(e) {
     e.preventDefault()
     var item: BudgetItemRequest = {
+      id: crypto.randomUUID(),
       name: name,
       category_id: selectedcategory.toString(),
       item_type: itemType,
@@ -102,7 +103,7 @@ export function CreateBudgetItemPopUp(Props: CreateBudgetItemPopUpProps) {
             </SelectTrigger>
             <SelectContent>
               {itemTypes.map(t =>
-                <SelectItem value={t}>{t}</SelectItem>
+                <SelectItem value={t}>{i18n_t(i18n, `entities.budget_item.item_types.${t}`)}</SelectItem>
               )}
             </SelectContent>
           </Select>

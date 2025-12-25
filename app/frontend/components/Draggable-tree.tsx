@@ -56,7 +56,7 @@ function removeNodeAndCollect(
   return deleted
 }
 
-function addChild(tree: TreeDataItem[], parentId: string, child: TreeDataItem): TreeDataItem[] {
+export function addChildToTree(tree: TreeDataItem[], parentId: string, child: TreeDataItem): TreeDataItem[] {
   const next = cloneTree(tree)
   console.log(tree)
   const parent = findNode(next, parentId)

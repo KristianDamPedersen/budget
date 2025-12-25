@@ -2,3 +2,4 @@ da:
   entities:
     category:
       label: "kategori"
+      plural: "kategorier"

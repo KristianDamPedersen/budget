@@ -13,3 +13,6 @@ da:
         quarterly: "kvartalvis"
         biannual: "Halvårlig"
         yearly: "årlig"
+      item_types:
+        goal: "budget mål"
+        payment: "fast betaling"

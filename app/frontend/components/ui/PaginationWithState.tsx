@@ -20,12 +20,12 @@ export type PaginationWithStateProps = {
 }
 export function PaginationWithState(Props: PaginationWithStateProps) {
   const { onActivePageChange, totalPages, initialPageNum, perPage } = Props
-  const [activePagenumber, setActivePageNumber] = useState<number>(0)
+  const [activePagenumber, setActivePageNumber] = useState<number>(1)
   const [firstElemValue, setFirstElemValue] = useState<number>(0)
   const [secondElemValue, setSecondElemValue] = useState<number>(0)
   const [thirdElemValue, setThirdElemValue] = useState<number>(0)
   useEffect(() => {
-    if (activePagenumber == totalPages) {
+    if (activePagenumber == totalPages && totalPages > 3) {
       setFirstElemValue(activePagenumber - 2)
       setSecondElemValue(activePagenumber - 1)
       setThirdElemValue(activePagenumber)

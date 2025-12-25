@@ -1,4 +1,5 @@
 export type BudgetItem = {
+  id: string,
   budget_id: string,
   name: string,
   created_by: string,
@@ -14,6 +15,7 @@ export type BudgetItem = {
 }
 
 export type BudgetItemRequest = {
+  id: string | undefined,
   name: string,
   category_id: string,
   item_type: string,

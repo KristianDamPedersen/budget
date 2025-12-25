@@ -29,6 +29,7 @@ type CreateBudgetProps = {
   budget_item_legend: string
   i18n: I18nNode,
   cadences: string[],
+  item_types: string[],
   default_categories: Record<string, BudgetCategory>
 }
 
@@ -49,8 +50,9 @@ export default function CreateBudget() {
     category_field_legend,
     category_field_description,
     budget_item_legend,
-    cadences } = (usePage().props as unknown) as CreateBudgetProps
-  const [items, setItems] = useState<BudgetItem[]>([])
+    cadences,
+    item_types } = (usePage().props as unknown) as CreateBudgetProps
+  const [items, setItems] = useState<BudgetItemRequest[]>([])
   const currentId = useRef<number>(0)
   const [categoryTree, setCategoryTree] = useState<TreeDataItem[]>([])
   const [flattenedCategoryTree, setFlattenedCategoryTree] = useState<BudgetCategory[]>([])
@@ -62,7 +64,7 @@ export default function CreateBudget() {
     items: []
   })
 
-  function AddItem(item: BudgetItem) {
+  function AddItem(item: BudgetItemRequest) {
     setItems(prev => [...prev, item])
   }
   useEffect(() => {
@@ -94,15 +96,7 @@ export default function CreateBudget() {
     console.log(flattenedCategoryTree)
     form.transform((data) => ({
       ...data,
-      items: items.map(x => ({
-        name: x.name,
-        category_id: x.category_id,
-        item_type: x.item_type,
-        cadence: x.cadence,
-        first_occurence: x.first_occurence,
-        currency: x.currency,
-        value: x.value
-      })),
+      items: items,
       categories: flattenedCategoryTree
     }))
     form.post('/budget/create', {
@@ -171,7 +165,7 @@ export default function CreateBudget() {
                   onSubmit={AddItem}
                   cadenceTypes={cadences}
                   categories={flattenedCategoryTree}
-                  itemTypes={["Fast udgift", "forbrugs mål"]} />
+                  itemTypes={item_types} />
                 <BudgetItemTable
                   data={items}
                   setData={setItems}
