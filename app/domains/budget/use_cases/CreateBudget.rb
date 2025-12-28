@@ -1,16 +1,8 @@
 module Budget
   module UseCases
     class CreateBudget
-    Request = Data.define(:name, :owned_by, :categories, :items)
+       Request = Data.define(:name, :owned_by, :categories, :items)
       Response = Data.define(:name, :owned_by, :budget_categories, :items)
-      INTERVAL_MAP = {
-        "daglig"   => 1.days,
-        "ugentlig" => 1.weeks,
-        "månedlig" => 1.months,
-        "årlig"    => 1.years,
-        "kvartalvis" => 3.months,
-        "halvårlig" => 6.months
-      }.freeze
       def call(request)
         budget = nil
         categoryMap = {}
@@ -31,15 +23,15 @@ module Budget
 
         request.items.each do | item|
             cat = categoryMap[item["category_id"].to_s]
-
+            cadence_interval = Budget::Domain::BudgetItem::CADENCE_KEY_TO_INTERVAL[item["cadence"]]
             raise "Unknown category_id #{item["category_id"]} (known: #{category_map.keys.join(", ")})" if cat.nil?
             Rails.logger.info "item cadence from request: #{item['cadence'].inspect}"
-            Rails.logger.info "item cadence translated: #{INTERVAL_MAP[item['cadence']].inspect}"
+            Rails.logger.info "item cadence translated: #{cadence_interval}"
             bi = budget.budget_items.new(
               name: item["name"],
               budget_category: cat,
               item_type: item["item_type"],
-              cadence: INTERVAL_MAP[item["cadence"]],
+              cadence: cadence_interval,
               first_occurence: item["first_occurence"],
               currency: item["currency"],
               created_by: "7934de8e-c5a5-4f1d-86ad-0fe133f81f67",

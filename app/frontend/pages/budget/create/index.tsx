@@ -14,6 +14,8 @@ import { BudgetItemTable, BudgetItemTableProps } from '@/components/budget/Budge
 import { BudgetItem, BudgetItemRequest } from '@/types/budget/BudgetItem'
 import { CreateBudgetItemPopUp, CreateBudgetItemPopUpProps } from '@/components/budget/CreateBudgetItemPopUp'
 import { BudgetCategory } from '@/types/budget/BudgetCategory'
+import { NavBar } from '@/components/nav-bar'
+import { Cadence } from '@/types/budget/cadence'
 
 type CreateBudgetProps = {
 
@@ -26,6 +28,8 @@ type CreateBudgetProps = {
   category_field_description: string
   budget_item_legend: string
   i18n: I18nNode,
+  cadences: string[],
+  item_types: string[],
   default_categories: Record<string, BudgetCategory>
 }
 
@@ -45,8 +49,10 @@ export default function CreateBudget() {
     category_field_placeholder,
     category_field_legend,
     category_field_description,
-    budget_item_legend } = (usePage().props as unknown) as CreateBudgetProps
-  const [items, setItems] = useState<BudgetItem[]>([])
+    budget_item_legend,
+    cadences,
+    item_types } = (usePage().props as unknown) as CreateBudgetProps
+  const [items, setItems] = useState<BudgetItemRequest[]>([])
   const currentId = useRef<number>(0)
   const [categoryTree, setCategoryTree] = useState<TreeDataItem[]>([])
   const [flattenedCategoryTree, setFlattenedCategoryTree] = useState<BudgetCategory[]>([])
@@ -58,7 +64,7 @@ export default function CreateBudget() {
     items: []
   })
 
-  function AddItem(item: BudgetItem) {
+  function AddItem(item: BudgetItemRequest) {
     setItems(prev => [...prev, item])
   }
   useEffect(() => {
@@ -90,15 +96,7 @@ export default function CreateBudget() {
     console.log(flattenedCategoryTree)
     form.transform((data) => ({
       ...data,
-      items: items.map(x => ({
-        name: x.name,
-        category_id: x.category_id,
-        item_type: x.item_type,
-        cadence: x.cadence,
-        first_occurence: x.first_occurence,
-        currency: x.currency,
-        value: x.value
-      })),
+      items: items,
       categories: flattenedCategoryTree
     }))
     form.post('/budget/create', {
@@ -134,6 +132,7 @@ export default function CreateBudget() {
 
   return (
     <div>
+      <NavBar />
       <div className="flex flex-col gap-y-6 m-md px-4 pb-4 max-w-md">
         <h1 className="text-4xl font-bold tracking-tight">{title}</h1>
         <form onSubmit={onSubmit}>
@@ -164,9 +163,9 @@ export default function CreateBudget() {
                 <CreateBudgetItemPopUp
                   i18n={i18n}
                   onSubmit={AddItem}
-                  cadenceTypes={["daglig", "ugentlig", "månedlig", "kvartalvis", "halvårlig", "årlig"]}
+                  cadenceTypes={cadences}
                   categories={flattenedCategoryTree}
-                  itemTypes={["Fast udgift", "forbrugs mål"]} />
+                  itemTypes={item_types} />
                 <BudgetItemTable
                   data={items}
                   setData={setItems}
