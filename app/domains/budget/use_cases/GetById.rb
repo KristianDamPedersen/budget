@@ -3,7 +3,7 @@ module Budget
   module UseCases
     class GetById
       Request = Data.define(:id)
-      Response = Data.define(:name, :budgetCategories, :budgetItems)
+      Response = Data.define(:id, :name, :budgetCategories, :budgetItems)
       def call(request)
         budget = Domain::Budget.find(request.id)
             items = budget.budget_items.map do |item|
@@ -23,7 +23,7 @@ module Budget
                 category_id: item.category_id
               }
         end
-        Response.new(name: budget.name, budgetCategories: budget.budget_categories, budgetItems: items)
+        Response.new(id: budget.id, name: budget.name, budgetCategories: budget.budget_categories, budgetItems: items)
       end
     end
   end

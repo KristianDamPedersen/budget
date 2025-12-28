@@ -69,30 +69,39 @@ class Api::V1::BudgetController < InertiaController
       inertia: { errors: e.record.errors.to_hash(true) }
     )
   end
-  private
-def update
-  req = Budget::UseCases::UpdateBudget::Request.new(
-    budget_id: params[:id],
-    name: budget_params[:name],
-    owned_by: "6658b89c-74aa-444c-95c9-acae486df11c",
-    categories: budget_params[:categories],
-    items: budget_params[:items]
-  )
+  def update
+    req = Budget::UseCases::UpdateBudget::Request.new(
+      budget_id: params[:id],
+      name: put_params[:name],
+      categories: put_params[:categories],
+      items: put_params[:items]
+    )
 
   Budget::UseCases::UpdateBudget.new.call(req)
 
-  # redirect or render inertia props as you prefer
-rescue ActiveRecord::RecordInvalid => e
-  Rails.logger.error("RecordInvalid: #{e.record.class} #{e.record.errors.full_messages.join(", ")}")
-  redirect_back(
-    fallback_location: "/budget/#{params[:id]}",
-    inertia: { errors: e.record.errors.to_hash(true) }
-  )
-end
+    # redirect or render inertia props as you prefer
+  rescue ActiveRecord::RecordInvalid => e
+    Rails.logger.error("RecordInvalid: #{e.record.class} #{e.record.errors.full_messages.join(", ")}")
+    redirect_back(
+      fallback_location: "/budget/#{params[:id]}",
+      inertia: { errors: e.record.errors.to_hash(true) }
+    )
+  end
+
+  private
   def budget_params
    params.require(:budget).permit(
     :name,
     categories: [ :id, :name, :parent_id ],
+    items: [ :id, :budget_id, :name, :category_id, :item_type, :cadence, :value, :currency, :first_occurence ]
+  )
+  end
+
+  def put_params
+   params.require(:budget).permit(
+    :name,
+
+      categories: [ :id, :name, :parent_category_id, :budget_id, :created_at, :updated_at ],
     items: [ :id, :budget_id, :name, :category_id, :item_type, :cadence, :value, :currency, :first_occurence ]
   )
   end

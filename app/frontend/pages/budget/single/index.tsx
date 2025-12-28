@@ -9,8 +9,8 @@ import { Input } from '@/components/ui/input'
 import { i18n_t, I18nNode } from '@/lib/utils'
 import { Budget } from '@/types/budget/budget'
 import { BudgetCategory } from '@/types/budget/BudgetCategory'
-import { BudgetItem } from '@/types/budget/BudgetItem'
-import { usePage } from '@inertiajs/react'
+import { BudgetItem, BudgetItemRequest } from '@/types/budget/BudgetItem'
+import { useForm, usePage } from '@inertiajs/react'
 import { useEffect, useState } from 'react'
 
 export type SingleBudgetPageProps = {
@@ -22,15 +22,14 @@ export type SingleBudgetPageProps = {
 export default function SingleBudgetPage() {
   const { budget, i18n, item_types, cadences } = (usePage().props as unknown) as SingleBudgetPageProps
 
-  const [items, setItems] = useState<BudgetItem[]>([])
+  const [items, setItems] = useState<BudgetItemRequest[]>([])
   const [categories, setCategories] = useState<BudgetCategory[]>([])
   const [pendingCategory, setPendingCategory] = useState<string>("")
   const [categoryTree, setCategoryTree] = useState<TreeDataItem[]>([])
+
   useEffect(() => {
-    console.log(budget)
     setItems(budget.budgetItems)
     setCategories(budget.budgetCategories)
-    console.log(budget.budgetCategories)
     setCategoryTree(BudgetCategoriesToTree(budget.budgetCategories))
   }, [])
   function flattenTree(elements: TreeDataItem[], parentId: string | null): BudgetCategory[] {
@@ -44,6 +43,13 @@ export default function SingleBudgetPage() {
     }
     return items
   }
+  type UpdateBudgetFormDataType = {
+    name: string,
+    items: BudgetItemRequest[],
+    categories: BudgetCategory[]
+
+  }
+
   function handleSave(tree: TreeDataItem[]) {
     setCategoryTree(tree)
     console.log("saving....")
@@ -51,11 +57,42 @@ export default function SingleBudgetPage() {
     console.log(newCategories)
     setCategories(newCategories)
   }
+  function handleSubmit() {
+    fetch(`/budget/${budget.id}`, {
+      method: "PUT", // or PATCH (Rails convention)
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "X-CSRF-Token": document
+          .querySelector('meta[name="csrf-token"]')
+          ?.getAttribute("content"),
+      },
+      body: JSON.stringify({
+        budget: {
+          name: budget.name,
+          items: items,
+          categories: categories,
+        },
+      }),
+    }).then(async (res) => {
+      if (!res.ok) {
+        console.log("status", res.status);
+        console.log(await res.text());
+      }
+    });
+  }
   return (
     <div>
       <NavBar />
       <div className='py-4 px-2'>
-        <h1 className="text-4xl">{budget.name}</h1>
+        <div className='grid grid-cols-5'>
+          <h1 className="text-4xl col-start-1">{budget.name}</h1>
+          <Button
+            className="col-start-4"
+            onClick={() => handleSubmit()}>
+            {i18n_t(i18n, "common.save")}
+          </Button>
+        </div>
         <div className='py-8'>
           <TreeWithOptionToEdit
             items={categoryTree}
