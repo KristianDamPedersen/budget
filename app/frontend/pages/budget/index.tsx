@@ -42,6 +42,11 @@ export default function BudgetOverviewPage() {
   function goToBudgetPage(id: string) {
     router.get(`/budget/${id}`)
   }
+
+  function deleteBudget(id: string, name: string) {
+    if (confirm(`${i18n_t(i18n, "pages.budget.index.delete_prompt_prefix")} ${name}?`))
+      router.delete(`/budget/${id}`)
+  }
   return (
     <div>
       <NavBar />
@@ -60,6 +65,10 @@ export default function BudgetOverviewPage() {
                 variant="outline"
                 onClick={() => goToBudgetPage(budget.id)}
                 size="sm">{i18n_t(i18n, "common.open")}</Button>
+              <Button
+                variant="destructive"
+                onClick={() => deleteBudget(budget.id, budget.name)}
+                size="sm">{i18n_t(i18n, "common.delete")}</Button>
             </ItemActions>
           </Item>
         )

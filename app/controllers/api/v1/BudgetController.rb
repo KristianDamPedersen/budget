@@ -4,6 +4,7 @@ class Api::V1::BudgetController < InertiaController
     "common",
     "entities.budget_item",
     "entities.category",
+    "pages.budget.index",
     "components.create_budget_item_popup",
     "components.currency_input"
    ]
@@ -87,8 +88,17 @@ class Api::V1::BudgetController < InertiaController
       inertia: { errors: e.record.errors.to_hash(true) }
     )
   end
+  def delete
+    req = Budget::UseCases::DeleteBudget::Request.new(
+    id: params[:id]
+  )
+    Budget::UseCases::DeleteBudget.new.call(req)
+  end
+
+
 
   private
+
   def budget_params
    params.require(:budget).permit(
     :name,

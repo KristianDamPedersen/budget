@@ -15,6 +15,7 @@ Rails.application.routes.draw do
   get "/budget/:id", to: "api/v1/budget#byId"
   post "/budget/create", to: "api/v1/budget#create"
   put "/budget/:id", to: "api/v1/budget#update"
+  delete "/budget/:id", to: "api/v1/budget#delete"
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
