@@ -1,4 +1,3 @@
-
 module Budget
   module UseCases
     class GetById
